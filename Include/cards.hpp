@@ -2,6 +2,8 @@
 #include <cstdlib>
 #include <ctime>
 #include <string>
+#include <iostream>
+#include <unistd.h>
 
 enum Card_type {
   EXPLODE, //0
@@ -22,26 +24,51 @@ class Card {
 public:
   Card(Card_type);
   void change_key();
-  void execute();
   Card_type get_type() { return type; }
+
 };
 
 struct Deck {
   std::vector<Card> card_vector;
 public:
   void create_deck(int);
+  int size () { return card_vector.size(); }
+  void print() {
+    std::cout << "In deck: \n";
+    for (auto a : card_vector)
+      std::cout << a.get_type() << std::endl;
+  }
+  void push_explode();
 };
 
 class Player {
   int hand[AMOUNT_OF_CARD_TYPES];
+  bool lost;
+  static int lost_amount;
 public:
-  void start_move();
+  Player (): lost(false) {
+    for (int j = 0; j < AMOUNT_OF_CARD_TYPES; j++) {
+      hand[j] = 0;
+    }
+
+  }
+  void start_move(Deck&, int);
+  void continue_move(Deck&);
   void get_card(Deck&);
   void start_get_card(Deck&);
+  bool didntlose () { return !lost; }
+  static int get_lost_am () { return lost_amount; }
+  //static void init_lost_am () { lost_amount = 0; }
+  static void inc_lost_am () { lost_amount++ ;}
+  void print(int num) {
+    std::cout << "Player " << num + 1 << " has:\n"; 
+    for (int i = 0; i < AMOUNT_OF_CARD_TYPES; i++) {
+      std::cout <<  "  " << hand[i] << " cards of type " << i << std::endl;
+    }
+  }
 };
 
 struct Exception {
-public:
   std::string reason;
   Exception(const std::string &reason)
     : reason(reason) {}
