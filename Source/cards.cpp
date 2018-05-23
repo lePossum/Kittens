@@ -42,9 +42,6 @@ void Deck::create_deck(int amount_of_players) {
   container[SHUFFLE] = 4;
   container[FORECAST] = 5;
 
-  std::cout << "Container has: " << container[EXPLODE] 
-    << " explodes and " << container[DIFUSE] << 
-    " difuses" << std::endl;
   int cards_in_cont = 0, i;
   for (i = 0; i < AMOUNT_OF_CARD_TYPES; i++) {
     cards_in_cont += container[i];
@@ -127,11 +124,11 @@ void Deck::shuffle() {
 void Deck::forecast() {
   int i = card_vector.size();
   if (i >= 1) {
-    std::cout << " 1st card is " << card_vector[i - 1];
+    std::cout << " 1st card is " << card_vector[i - 1] << std::endl;
     if (i >=2) {
-      std::cout << " 2nd card is " << card_vector[i - 2];
+      std::cout << " 2nd card is " << card_vector[i - 2] << std::endl;
       if (i >= 3) {
-        std::cout << " 3rd card is " << card_vector[i - 3];
+        std::cout << " 3rd card is " << card_vector[i - 3] << std::endl;
       }
     }
   }
@@ -210,23 +207,28 @@ int Player::slap (int cur_p) {
 }
 
 int Player::continue_move(Deck& cur_deck, int p_num) {
-  int j = print_self();
-  switch (j) {
-    case '2' :
-      hand[SLAP]--;
-      return slap(p_num);
-    case '3' :
-      hand[SKIP]--;
-      return 1;
-    case '4' :
-      hand[SHUFFLE]--;
-      cur_deck.shuffle();
-      return 0;
-    case '5' :
-      hand[FORECAST]--;
-      cur_deck.forecast();
-      return 0;
-  }
+  int j;
+  bool iteration = true;
+  do {
+    j = print_self();
+    switch (j) {
+      case '1' :
+        iteration = false;
+        break;
+      case '2' :
+        hand[SLAP]--;
+        return slap(p_num);
+      case '3' :
+        hand[SKIP]--;
+        return 1;
+      case '4' :
+        hand[SHUFFLE]--;
+        cur_deck.shuffle();
+      case '5' :
+        hand[FORECAST]--;
+        cur_deck.forecast();
+    }
+  } while (iteration);
   return 0;
 }
 
@@ -237,7 +239,7 @@ int Player::start_move(Deck& cur_deck, int i) {
   if (a) return a - 1;
   get_card(cur_deck);
   if (system("CLS")) system("clear");
-  print(i);
+  //print(i);
   //cur_deck.print();
   if (hand[EXPLODE] > 0) {
     if (hand[DIFUSE] > 0) {

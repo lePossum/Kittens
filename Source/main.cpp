@@ -39,16 +39,16 @@ int main() {
     }
   }
   //cur_deck.print();
-  for (int j = 0; j < players_amount; j++) {
-    player_number[j].print(j);
-  }
+  // for (int j = 0; j < players_amount; j++) {
+  //   player_number[j].print(j);
+  // }
   int i = 0;
   //for (int i = 0; i < players_amount; (i++)%players_amount) {
   do { 
    // std::cout << "In cycle w/ i = " << i << std::endl;
     if (player_number[i].didntlose()) 
       if (Player::get_lost_am() < players_amount - 1) {
-        cur_deck.print();
+        //cur_deck.print();
         i += player_number[i].start_move(cur_deck, i);
         i = i%players_amount;
       } else {
