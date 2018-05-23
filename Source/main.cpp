@@ -7,8 +7,10 @@ enum {
 };
 
 int Player::lost_amount = 0;
+int Player::players_amount = MAX_AMOUNT_OF_PLAYERS;
 
 int main() {
+  std::srand(unsigned(std::time(0)));
   int players_amount = MAX_AMOUNT_OF_PLAYERS;
   bool correct_am = false;
   while (!correct_am) {
@@ -18,6 +20,7 @@ int main() {
     if ((players_amount <= MAX_AMOUNT_OF_PLAYERS) 
       && (players_amount >= 2)) {
         correct_am = true;
+        Player::set_p_am(players_amount);
     } else {
       if (system("CLS")) system("clear");
       std::cout << "Wrong amount of players, try again\n";
@@ -25,28 +28,29 @@ int main() {
   }
   Deck cur_deck;
   cur_deck.create_deck(players_amount);
-  cur_deck.print();
+  //cur_deck.print();
   Player player_number[players_amount];
-  for (int j = 0; j < players_amount; j++) {
-      player_number[j].print(j);
-    }
+  // for (int j = 0; j < players_amount; j++) {
+  //     player_number[j].print(j);
+  //   }
   for (int i = 0; i < START_CARDS_AMOUNT; i++) {
     for (int j = 0; j < players_amount; j++) {
       player_number[j].start_get_card(cur_deck);
     }
   }
-  cur_deck.print();
+  //cur_deck.print();
   for (int j = 0; j < players_amount; j++) {
     player_number[j].print(j);
   }
   int i = 0;
   //for (int i = 0; i < players_amount; (i++)%players_amount) {
   do { 
-    std::cout << "In cycle w/ i = " << i << std::endl;
+   // std::cout << "In cycle w/ i = " << i << std::endl;
     if (player_number[i].didntlose()) 
       if (Player::get_lost_am() < players_amount - 1) {
         cur_deck.print();
-        player_number[i].start_move(cur_deck, i);
+        i += player_number[i].start_move(cur_deck, i);
+        i = i%players_amount;
       } else {
         std::cout << "Player " << i + 1 << " has won the game!\n";
         return 0;

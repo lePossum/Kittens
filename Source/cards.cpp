@@ -2,20 +2,46 @@
 
 Card::Card(Card_type c_type) {
   type = c_type;
-  std::srand(unsigned(std::time(0)));
   card_key = std::rand();
 }
 
 void Card::change_key(){
-  std::srand(unsigned(std::time(0)));
   card_key = std::rand();
+}
+
+std::ostream& operator<<(std::ostream& str, Card output_c) {
+  switch (output_c.get_type()) {
+    case (0):
+      std::cout << "EXPLODE";
+      break;
+    case (1):
+      std::cout << "DIFUSE";
+      break;
+    case (2):
+      std::cout << "SLAP";
+      break;
+    case (3):
+      std::cout << "SKIP";
+      break;
+    case (4):
+      std::cout << "SHUFFLE";
+      break;
+    case (5):
+      std::cout << "FORECAST";
+      break;
+  }
 }
 
 void Deck::create_deck(int amount_of_players) {
   int container[AMOUNT_OF_CARD_TYPES];
-  std::srand(unsigned(std::time(0)));
+
   container[EXPLODE] = amount_of_players - 1;
   container[DIFUSE] = 6;
+  container[SLAP] = 4;
+  container[SKIP] = 4;
+  container[SHUFFLE] = 4;
+  container[FORECAST] = 5;
+
   std::cout << "Container has: " << container[EXPLODE] 
     << " explodes and " << container[DIFUSE] << 
     " difuses" << std::endl;
@@ -28,7 +54,6 @@ void Deck::create_deck(int amount_of_players) {
     iteration = true;
     while (iteration) {
       i = std::rand() % AMOUNT_OF_CARD_TYPES;
-      std::cout << "Number of card type is " << i << std::endl;
       if (container[i] > 0) {
         container[i]--;
         cards_in_cont--;
@@ -55,7 +80,6 @@ void Deck::push_explode() {
     switch (c) {
       case '2':
         {
-          std::cout << "   IN CASE 2" << std::endl;
           if (i >=2) {
             card_vector.push_back(Card((Card_type)0));
             auto temp = card_vector[i];
@@ -65,36 +89,52 @@ void Deck::push_explode() {
           }
         } 
       case '1':
-        
-          std::cout << "   IN CASE 1" << std::endl;
-          if (i >=1) {
-            card_vector.push_back(Card((Card_type)0));
-            auto temp = card_vector[i];
-            card_vector[i] = card_vector[i - 1];
-            card_vector[i - 1] = temp;
-            break;
-          }
-        
-      case '0':
-        
-          std::cout << "   IN CASE 0" << std::endl;
+        if (i >=1) {
           card_vector.push_back(Card((Card_type)0));
-        
+          auto temp = card_vector[i];
+          card_vector[i] = card_vector[i - 1];
+          card_vector[i - 1] = temp;
+          break;
+        }
+      case '0':
+        card_vector.push_back(Card((Card_type)0));
         break;
       case '4':
         {
-          std::cout << "   IN CASE 4" << std::endl;
           auto iter = card_vector.begin();
           card_vector.insert(iter, Card((Card_type)0));
         }
-          break;
+        break;
       default : 
         {
           iteration = false;
-          std::cout << "Wrong number inputted\n, try again: ";
+          std::cout << "Wrong number input,\n try again: ";
         }
     }
   } while (!iteration);
+}
+
+void Deck::shuffle() {
+  std::sort(card_vector.begin(), card_vector.end(),
+    [] (Card a, Card b) {
+      return a.get_key() > b.get_key();
+    });
+  for (auto& n : card_vector) {
+    n.change_key();
+  }
+}
+
+void Deck::forecast() {
+  int i = card_vector.size();
+  if (i >= 1) {
+    std::cout << " 1st card is " << card_vector[i - 1];
+    if (i >=2) {
+      std::cout << " 2nd card is " << card_vector[i - 2];
+      if (i >= 3) {
+        std::cout << " 3rd card is " << card_vector[i - 3];
+      }
+    }
+  }
 }
 
 void Player::get_card(Deck& cur_deck) {
@@ -136,13 +176,69 @@ void Player::start_get_card(Deck& cur_deck) {
   cur_deck.card_vector.pop_back();
 }
 
-void Player::start_move(Deck& cur_deck, int i) {
+char Player::print_self() {
+  char c;
+  std::cout << "Choose, what you do:\n";
+    std::cout << " if you want to get a card  enter '1' " << std::endl;
+  if (hand[2] > 0)
+    std::cout << " to slap an opponent        enter '2' " << std::endl;
+  if (hand[3] > 0)
+    std::cout << " to skip your step          enter '3' " << std::endl;
+  if (hand[4] > 0)
+    std::cout << " to shuffle the deck        enter '4' " << std::endl;
+  if (hand[5] > 0)
+    std::cout << " to see the future          enter '5' " << std::endl;
+  if (hand[1] > 0) {
+    std::cout << " also you have " << hand[1] << " difuse cards" << std::endl;
+  }
+  do {
+    std::cout << "Your choice: ";
+    std::cin >> c;
+    std::cout << std::endl;
+  } while ((c < 1 + '0') || (c >= AMOUNT_OF_CARD_TYPES + '0'));
+  return c;
+}
+
+int Player::slap (int cur_p) {
+  char c;
+  do {
+    std::cout << "Choose a player to slap : ";
+    std::cin >> c;
+    std::cout << c - '0' << " and " << cur_p << std::endl;
+  } while ((c < '1') || (c > players_amount + '0') || (c == cur_p + '0'));
+  return (c - '0') - cur_p;
+}
+
+int Player::continue_move(Deck& cur_deck, int p_num) {
+  int j = print_self();
+  switch (j) {
+    case '2' :
+      hand[SLAP]--;
+      return slap(p_num);
+    case '3' :
+      hand[SKIP]--;
+      return 1;
+    case '4' :
+      hand[SHUFFLE]--;
+      cur_deck.shuffle();
+      return 0;
+    case '5' :
+      hand[FORECAST]--;
+      cur_deck.forecast();
+      return 0;
+  }
+  return 0;
+}
+
+int Player::start_move(Deck& cur_deck, int i) {
   char c = 0;//input_char
+  std::cout << "Player " << i + 1 << std::endl;
+  int a = continue_move(cur_deck, i + 1);
+  if (a) return a - 1;
   get_card(cur_deck);
   if (system("CLS")) system("clear");
   print(i);
   //cur_deck.print();
-  std::cout << "Player " << i + 1 << std::endl;
   if (hand[EXPLODE] > 0) {
     if (hand[DIFUSE] > 0) {
       std::cout << "If you don't want to use your DIFUSE card,\n";
@@ -152,25 +248,21 @@ void Player::start_move(Deck& cur_deck, int i) {
         std::cout << "GG u chose your lose :( \n";
         lost = true;
         Player::inc_lost_am();
-        return;
+        return 0;
       } else {
-        std::cout << "U used your DIFUSE card\n";
+        std::cout << "You used your DIFUSE card\n";
         hand[DIFUSE]--;
         hand[EXPLODE]--;
         //cur_deck.card_vector.push_back(Card(EXPLODE));
         cur_deck.push_explode();
       }
     } else {
-      std::cout << "Prepare for your lose :( \n";
-      sleep(1);
+      std::cout << "You lost, good luck next :( \n";
+      //std::cin >> c;
       lost = true;
       Player::inc_lost_am();
-      return;
+      return 0;
     }
   }
-  continue_move(cur_deck);
-}
-
-void Player::continue_move(Deck& cur_deck) {
-  return;
+  return 0;
 }

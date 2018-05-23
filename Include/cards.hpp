@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <unistd.h>
+#include <algorithm>
 
 enum Card_type {
   EXPLODE, //0
@@ -15,7 +16,7 @@ enum Card_type {
 };
 
 enum {
-  AMOUNT_OF_CARD_TYPES = 2
+  AMOUNT_OF_CARD_TYPES = 6
 };
 
 class Card {
@@ -25,8 +26,10 @@ public:
   Card(Card_type);
   void change_key();
   Card_type get_type() { return type; }
-
+  int get_key() { return card_key; }
 };
+
+std::ostream& operator<<(std::ostream&, Card);
 
 struct Deck {
   std::vector<Card> card_vector;
@@ -34,31 +37,34 @@ public:
   void create_deck(int);
   int size () { return card_vector.size(); }
   void print() {
-    std::cout << "In deck: \n";
+    std::cout << "  In deck: \n";
     for (auto a : card_vector)
-      std::cout << a.get_type() << std::endl;
+      std::cout << "  " << a.get_type() << std::endl;
   }
   void push_explode();
+  void shuffle();
+  void forecast();
 };
 
 class Player {
   int hand[AMOUNT_OF_CARD_TYPES];
   bool lost;
   static int lost_amount;
+  static int players_amount;
 public:
   Player (): lost(false) {
     for (int j = 0; j < AMOUNT_OF_CARD_TYPES; j++) {
       hand[j] = 0;
     }
-
   }
-  void start_move(Deck&, int);
-  void continue_move(Deck&);
+  int slap(int);
+  int start_move(Deck&, int);
+  int continue_move(Deck&, int);
   void get_card(Deck&);
   void start_get_card(Deck&);
   bool didntlose () { return !lost; }
   static int get_lost_am () { return lost_amount; }
-  //static void init_lost_am () { lost_amount = 0; }
+  static void set_p_am (int a) { players_amount = a; }
   static void inc_lost_am () { lost_amount++ ;}
   void print(int num) {
     std::cout << "Player " << num + 1 << " has:\n"; 
@@ -66,6 +72,7 @@ public:
       std::cout <<  "  " << hand[i] << " cards of type " << i << std::endl;
     }
   }
+  char print_self();
 };
 
 struct Exception {
