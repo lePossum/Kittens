@@ -190,8 +190,11 @@ char Player::print_self() {
   }
   do {
     std::cout << "Your choice: ";
-    std::cin >> c;
-    std::cout << std::endl;
+    while (!(std::cin >> c) || (std::cin.peek() != '\n')) {
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
+      std::cout << "Input error! Retry: ";
+    }
   } while ((c < 1 + '0') || (c >= AMOUNT_OF_CARD_TYPES + '0'));
   return c;
 }
@@ -199,9 +202,18 @@ char Player::print_self() {
 int Player::slap (int cur_p) {
   char c;
   do {
-    std::cout << "Choose a player to slap : ";
-    std::cin >> c;
-    std::cout << c - '0' << " and " << cur_p << std::endl;
+    std::cout << "Choose a player to slap: ";
+    while (!(std::cin >> c) || (std::cin.peek() != '\n')) {
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
+      std::cout << "Input error! Retry: ";
+    }
+    if (c == '0' + cur_p) {
+      std::cout << "You cannot slap yourself\n";
+    }
+    if ((c < '1') || (c > players_amount + '0')) {
+      std::cout << "You have to choose players from 1 to " << players_amount << std::endl;
+    }
   } while ((c < '1') || (c > players_amount + '0') || (c == cur_p + '0'));
   return (c - '0') - cur_p;
 }
@@ -216,17 +228,39 @@ int Player::continue_move(Deck& cur_deck, int p_num) {
         iteration = false;
         break;
       case '2' :
-        hand[SLAP]--;
-        return slap(p_num);
+        if(hand[SLAP] > 0) {
+          hand[SLAP]--;
+          return slap(p_num);
+        } else {
+          std::cout << "You don't have any SLAP cards\n";
+          break;
+        }
       case '3' :
-        hand[SKIP]--;
-        return 1;
+        if (hand[SKIP] > 0) {
+          hand[SKIP]--;
+          return 1;
+        } else {
+          std::cout << "You don't have any SKIP cards\n";          
+          break;
+        }
       case '4' :
-        hand[SHUFFLE]--;
-        cur_deck.shuffle();
+        if (hand[SHUFFLE] > 0) {
+          hand[SHUFFLE]--;
+          cur_deck.shuffle();
+          break;
+        } else {
+          std::cout << "You don't have any SHUFFLE cards\n";          
+          break;
+        }
       case '5' :
-        hand[FORECAST]--;
-        cur_deck.forecast();
+        if (hand[FORECAST] > 0) {
+          hand[FORECAST]--;
+          cur_deck.forecast();
+          break;
+        } else {
+          std::cout << "You don't have any FORECAST cards\n";                    
+          break;
+        }
     }
   } while (iteration);
   return 0;
@@ -234,20 +268,24 @@ int Player::continue_move(Deck& cur_deck, int p_num) {
 
 int Player::start_move(Deck& cur_deck, int i) {
   char c = 0;//input_char
+  if (system("CLS")) system("clear");
   std::cout << "Player " << i + 1 << std::endl;
   int a = continue_move(cur_deck, i + 1);
   if (a) return a - 1;
   get_card(cur_deck);
-  if (system("CLS")) system("clear");
   //print(i);
   //cur_deck.print();
   if (hand[EXPLODE] > 0) {
     if (hand[DIFUSE] > 0) {
       std::cout << "If you don't want to use your DIFUSE card,\n";
-      std::cout << "enter n\n";
-      std::cin >> c;
-      if (c == 'n') {
-        std::cout << "GG u chose your lose :( \n";
+      std::cout << "enter 'n'\n";
+      while (!(std::cin >> c) || (std::cin.peek() != '\n')) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
+        std::cout << "Input error! Retry: ";
+      }
+      if ((c == 'n') || (c == 'N')) {
+        std::cout << "GG you chose your lose :( \n";
         lost = true;
         Player::inc_lost_am();
         return 0;
