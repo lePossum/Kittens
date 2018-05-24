@@ -175,7 +175,7 @@ void Player::start_get_card(Deck& cur_deck) {
         cur_deck.card_vector[i - 1] = temp;
       }
     } else {
-      throw Exception("Wrong vector index in start_get_card\n");
+      //throw Exception("Wrong vector index in start_get_card\n");
     }
   }
   hand[final_card.get_type()]++;

@@ -3,7 +3,7 @@
 
 enum {
   MAX_AMOUNT_OF_PLAYERS = 4,
-  START_CARDS_AMOUNT = 1
+  START_CARDS_AMOUNT = 3
 };
 
 int Player::lost_amount = 0;
