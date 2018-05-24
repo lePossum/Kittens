@@ -32,6 +32,7 @@ std::ostream& operator<<(std::ostream& str, Card output_c) {
       break;
   }
   std::cout << "\033[0m";
+  return str;
 }
 
 void Deck::create_deck(int amount_of_players) {
@@ -76,7 +77,11 @@ void Deck::push_explode() {
   int i = size();
   bool iteration;
   do {
-    std::cin >> c;
+    while (!(std::cin >> c) || (std::cin.peek() != '\n')) {
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
+      std::cout << "Input error! Retry: ";
+    }
     iteration = true;
     switch (c) {
       case '2':

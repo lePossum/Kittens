@@ -15,7 +15,11 @@ int main() {
   bool correct_am = false;
   while (!correct_am) {
     std::cout << "Input amount of players : ";
-    std::cin >> players_amount;
+    while (!(std::cin >> players_amount) || (std::cin.peek() != '\n')) {
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
+      std::cout << "Input error! Retry: ";
+    }
     std::cout << std::endl;
     if ((players_amount <= MAX_AMOUNT_OF_PLAYERS) 
       && (players_amount >= 2)) {
