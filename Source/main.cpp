@@ -1,4 +1,4 @@
-#include <iostream>
+//#include <iostream>
 #include "cards.hpp"
 
 enum {
@@ -52,7 +52,7 @@ int main() {
         i += player_number[i].start_move(cur_deck, i);
         i = i%players_amount;
       } else {
-        std::cout << "Player " << i + 1 << " has won the game!\n";
+        std::cout << "\033[0;34mPlayer " << i + 1 << " has won the game!\033[0m\n";
         return 0;
       }
     i = (i+1)%players_amount;

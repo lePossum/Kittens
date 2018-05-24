@@ -10,6 +10,7 @@ void Card::change_key(){
 }
 
 std::ostream& operator<<(std::ostream& str, Card output_c) {
+  std::cout << "\033[0;36m";
   switch (output_c.get_type()) {
     case (0):
       std::cout << "EXPLODE";
@@ -30,6 +31,7 @@ std::ostream& operator<<(std::ostream& str, Card output_c) {
       std::cout << "FORECAST";
       break;
   }
+  std::cout << "\033[0m";
 }
 
 void Deck::create_deck(int amount_of_players) {
@@ -64,7 +66,9 @@ void Deck::create_deck(int amount_of_players) {
 
 void Deck::push_explode() {
   char c;
-  std::cout << "If you want to put EXPLODE card:\n";
+  std::cout << "If you want to put ";
+  std::cout << "\033[0;41mEXPLODE\033[0m"; 
+  std::cout << " card:\n";
   std::cout << "  at the top of the deck,    enter 0\n";
   std::cout << "  after next card,           enter 1\n";
   std::cout << "  third in the deck,         enter 2\n";
@@ -175,18 +179,18 @@ void Player::start_get_card(Deck& cur_deck) {
 
 char Player::print_self() {
   char c;
-  std::cout << "Choose, what you do:\n";
-    std::cout << " if you want to get a card  enter '1' " << std::endl;
+  std::cout << "\033[0;4mChoose, what you do:\033[0m\n";
+    std::cout << "  if you want to get a card  enter '1' " << std::endl;
   if (hand[2] > 0)
-    std::cout << " to slap an opponent        enter '2' " << std::endl;
+    std::cout << "  to slap an opponent        enter '2' " << std::endl;
   if (hand[3] > 0)
-    std::cout << " to skip your step          enter '3' " << std::endl;
+    std::cout << "  to skip your step          enter '3' " << std::endl;
   if (hand[4] > 0)
-    std::cout << " to shuffle the deck        enter '4' " << std::endl;
+    std::cout << "  to shuffle the deck        enter '4' " << std::endl;
   if (hand[5] > 0)
-    std::cout << " to see the future          enter '5' " << std::endl;
+    std::cout << "  to see the future          enter '5' " << std::endl;
   if (hand[1] > 0) {
-    std::cout << " also you have " << hand[1] << " difuse cards" << std::endl;
+    std::cout << " Also you have " << hand[1] << " difuse cards" << std::endl;
   }
   do {
     std::cout << "Your choice: ";
@@ -202,7 +206,7 @@ char Player::print_self() {
 int Player::slap (int cur_p) {
   char c;
   do {
-    std::cout << "Choose a player to slap: ";
+    std::cout << "\033[0;4mChoose a player to slap:\033[0m ";
     while (!(std::cin >> c) || (std::cin.peek() != '\n')) {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
@@ -269,36 +273,45 @@ int Player::continue_move(Deck& cur_deck, int p_num) {
 int Player::start_move(Deck& cur_deck, int i) {
   char c = 0;//input_char
   if (system("CLS")) system("clear");
-  std::cout << "Player " << i + 1 << std::endl;
+  std::cout << "\033[0;36m" << "Player " << i + 1 << "\033[0m" <<std::endl;
   int a = continue_move(cur_deck, i + 1);
   if (a) return a - 1;
   get_card(cur_deck);
   //print(i);
   //cur_deck.print();
   if (hand[EXPLODE] > 0) {
+    std::cout << "You have got an ";
+    std::cout << "\033[0;41mEXPLODE\033[0m";
+    std::cout << " card\n";
     if (hand[DIFUSE] > 0) {
-      std::cout << "If you don't want to use your DIFUSE card,\n";
-      std::cout << "enter 'n'\n";
+      std::cout << "If you don't want to use your ";
+      std::cout << "\033[0;42mDIFUSE\033[0m";
+      std::cout << " card,\nenter 'n'\n";
       while (!(std::cin >> c) || (std::cin.peek() != '\n')) {
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
         std::cout << "Input error! Retry: ";
       }
       if ((c == 'n') || (c == 'N')) {
-        std::cout << "GG you chose your lose :( \n";
+        std::cout << "\033[0;31mGG you chose your lose :( \033[0m (input anything)\n";
+        std::string temp;
+        std::cin >> temp;
         lost = true;
         Player::inc_lost_am();
         return 0;
       } else {
-        std::cout << "You used your DIFUSE card\n";
+        std::cout << "You used your ";
+        std::cout << "\033[0;42mDIFUSE\033[0m";
+        std::cout << " card\n";
         hand[DIFUSE]--;
         hand[EXPLODE]--;
         //cur_deck.card_vector.push_back(Card(EXPLODE));
         cur_deck.push_explode();
       }
     } else {
-      std::cout << "You lost, good luck next :( \n";
-      //std::cin >> c;
+      std::cout << "\033[0;31mYou lost, good luck next :( (input anything)\033[0m\n";
+      std::string temp;
+      std::cin >> temp;
       lost = true;
       Player::inc_lost_am();
       return 0;
