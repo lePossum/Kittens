@@ -63,6 +63,6 @@ int main() {
     i = (i+1)%players_amount;
   } while (true);
  } catch (...) {
- 	std::cerr << "Something went wrong\n";
+ 	std::cout << "Something went wrong\n";
  }
 }

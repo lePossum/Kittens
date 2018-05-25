@@ -48,3 +48,26 @@ clean :
 	rm -rf usr
 	rm -rf 1.gcda
 	rm -rf 1.gcno
+only_process_cov: 
+	gcov main.cpp -b
+	mkdir -p Coverage
+	mv *.gcda *.gcno *.gcov Coverage
+	lcov/bin/lcov --capture --directory Coverage --rc lcov_branch_coverage=1 --output-file Coverage/coverage.info
+	lcov/bin/genhtml Coverage/coverage.info --branch-coverage
+	mv *.html Coverage
+	mv *.png Coverage
+	mv *.css Coverage
+	cp -r Source Coverage
+	rm -f Source/*.html
+	rm -f Source/*.png
+	rm -f Source/*.css
+	rm -f Source/*.info
+	cp -r Include Coverage
+	rm -f Include/*.html
+	rm -f Include/*.png
+	rm -f Include/*.css
+	rm -f Include/*.info
+	cp -r 5 Coverage
+	cp -r home Coverage
+	rm -rf 5
+	rm -rf home
